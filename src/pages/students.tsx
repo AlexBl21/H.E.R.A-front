@@ -2,7 +2,8 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { BlogView } from 'src/sections/blog/view';
+// se llama estudiantes pero importaremos los etilos de usuario
+import { UserView } from 'src/sections/user/view';
 
 // ----------------------------------------------------------------------
 
@@ -10,10 +11,10 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {`Blog - ${CONFIG.appName}`}</title>
+        <title> {`Users - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <BlogView />
+      <UserView />
     </>
   );
 }

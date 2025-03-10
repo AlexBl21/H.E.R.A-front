@@ -11,28 +11,41 @@ export const navData = [
   {
     title: 'Dashboard',
     path: '/',
-    icon: icon('ic-analytics'),
+    icon: icon('ic-home'),
   },
   {
-    title: 'User',
-    path: '/user',
+    title: 'Students',
+    path: '/students',
     icon: icon('ic-user'),
   },
+  // {
+  //   title: 'Product',
+  //   path: '/products',
+  //   icon: icon('ic-cart'),
+  //   info: (
+  //     <Label color="error" variant="inverted">
+  //       +3
+  //     </Label>
+  //   ),
+  // },
+  // {
+  //   title: 'Blog',
+  //   path: '/blog',
+  //   icon: icon('ic-blog'),
+  // },
+
   {
-    title: 'Product',
-    path: '/products',
-    icon: icon('ic-cart'),
-    info: (
-      <Label color="error" variant="inverted">
-        +3
-      </Label>
-    ),
+    title: 'reports',
+    path: '/reports',
+    icon: icon('ic-analytics'),
   },
+
   {
-    title: 'Blog',
-    path: '/blog',
-    icon: icon('ic-blog'),
+    title: 'settings',
+    path: '/settings',
+    icon: icon('ic-settings'),
   },
+
   {
     title: 'Sign in',
     path: '/sign-in',

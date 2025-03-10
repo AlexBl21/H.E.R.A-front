@@ -41,12 +41,15 @@ export function UserTableHead({
           />
         </TableCell>
 
-        {headLabel.map((headCell) => (
+        {[
+          { id: 'name', label: 'Nombre', align: 'left', width: 250, minWidth: 200 },
+          { id: 'semester', label: 'Semestre', align: 'center', width: 100, minWidth: 80 },
+          { id: 'riskLevel', label: 'Nivel de Riesgo', align: 'center', width: 180, minWidth: 120 },
+          { id: 'actions', label: '', align: 'right', width: 50, minWidth: 50 },
+        ].map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.align || 'left'}
-            sortDirection={orderBy === headCell.id ? order : false}
-            sx={{ width: headCell.width, minWidth: headCell.minWidth }}
+            sx={{ width: headCell.width, minWidth: headCell.minWidth, textAlign: headCell.align }}
           >
             <TableSortLabel
               hideSortIcon
@@ -55,11 +58,6 @@ export function UserTableHead({
               onClick={() => onSort(headCell.id)}
             >
               {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box sx={{ ...visuallyHidden }}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
             </TableSortLabel>
           </TableCell>
         ))}

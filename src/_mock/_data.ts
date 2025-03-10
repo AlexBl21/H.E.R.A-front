@@ -1,14 +1,10 @@
 import {
   _id,
-  _price,
   _times,
-  _company,
   _boolean,
   _fullName,
-  _taskNames,
-  _postTitles,
-  _description,
-  _productNames,
+  _riesgo,
+  _semestre,
 } from './_mock';
 
 // ----------------------------------------------------------------------
@@ -24,41 +20,9 @@ export const _myAccount = {
 export const _users = [...Array(24)].map((_, index) => ({
   id: _id(index),
   name: _fullName(index),
-  company: _company(index),
-  isVerified: _boolean(index),
+  semestre: _semestre(index),
   avatarUrl: `/assets/images/avatar/avatar-${index + 1}.webp`,
-  status: index % 4 ? 'active' : 'banned',
-  role:
-    [
-      'Leader',
-      'Hr Manager',
-      'UI Designer',
-      'UX Designer',
-      'UI/UX Designer',
-      'Project Manager',
-      'Backend Developer',
-      'Full Stack Designer',
-      'Front End Developer',
-      'Full Stack Developer',
-    ][index] || 'UI Designer',
-}));
-
-// ----------------------------------------------------------------------
-
-export const _posts = [...Array(23)].map((_, index) => ({
-  id: _id(index),
-  title: _postTitles(index),
-  description: _description(index),
-  coverUrl: `/assets/images/cover/cover-${index + 1}.webp`,
-  totalViews: 8829,
-  totalComments: 7977,
-  totalShares: 8556,
-  totalFavorites: 8870,
-  postedAt: _times(index),
-  author: {
-    name: _fullName(index),
-    avatarUrl: `/assets/images/avatar/avatar-${index + 1}.webp`,
-  },
+  riesgo: _riesgo(index),
 }));
 
 // ----------------------------------------------------------------------
@@ -74,27 +38,7 @@ const COLORS = [
   '#FFC107',
 ];
 
-export const _products = [...Array(24)].map((_, index) => {
-  const setIndex = index + 1;
 
-  return {
-    id: _id(index),
-    price: _price(index),
-    name: _productNames(index),
-    priceSale: setIndex % 3 ? null : _price(index),
-    coverUrl: `/assets/images/product/product-${setIndex}.webp`,
-    colors:
-      (setIndex === 1 && COLORS.slice(0, 2)) ||
-      (setIndex === 2 && COLORS.slice(1, 3)) ||
-      (setIndex === 3 && COLORS.slice(2, 4)) ||
-      (setIndex === 4 && COLORS.slice(3, 6)) ||
-      (setIndex === 23 && COLORS.slice(4, 6)) ||
-      (setIndex === 24 && COLORS.slice(5, 6)) ||
-      COLORS,
-    status:
-      ([1, 3, 5].includes(setIndex) && 'sale') || ([4, 8, 12].includes(setIndex) && 'new') || '',
-  };
-});
 
 // ----------------------------------------------------------------------
 
@@ -133,12 +77,6 @@ export const _timeline = [...Array(5)].map((_, index) => ({
 
 // ----------------------------------------------------------------------
 
-export const _tasks = [...Array(5)].map((_, index) => ({
-  id: _id(index),
-  name: _taskNames(index),
-}));
-
-// ----------------------------------------------------------------------
 
 export const _notifications = [
   {

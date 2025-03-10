@@ -118,12 +118,15 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
   return (
     <>
-      <Logo />
+      {/* ESTO EXPORTA EL LOGO */}
+      <Logo /> 
 
       {slots?.topArea}
 
-      <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />
+      {/* ESTO DESPLIEGA EL DESPLEGABLES DE EQUIPOS */}
+      {/* <WorkspacesPopover data={workspaces} sx={{ my: 2 }} /> */}
 
+      {/* ESTO EXPORTA TODO LO DEL MENÚ, SE DEBE EDITAR EL COMPONENTE DE SCROLLBAR */}
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">
@@ -131,6 +134,7 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
               const isActived = item.path === pathname;
 
               return (
+                
                 <ListItem disableGutters disablePadding key={item.title}>
                   <ListItemButton
                     disableGutters
@@ -156,10 +160,12 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
                       }),
                     }}
                   >
+                    {/* ESTO DESPLIEGA ICONOS DE LAS OPCIONES DEL MENÚ */}
                     <Box component="span" sx={{ width: 24, height: 24 }}>
                       {item.icon}
                     </Box>
-
+                    
+                    {/* DESPLIEGA TEXTO DEL MENÚ */}
                     <Box component="span" flexGrow={1}>
                       {item.title}
                     </Box>

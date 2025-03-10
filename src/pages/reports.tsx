@@ -2,18 +2,18 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { ProductsView } from 'src/sections/product/view';
+import { ReportsView } from 'src/sections/reports/view';
 
 // ----------------------------------------------------------------------
 
-export default function Page() {
+export default function ReportsPage() {
   return (
     <>
       <Helmet>
-        <title> {`Products - ${CONFIG.appName}`}</title>
+        <title> {`Reportes - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <ProductsView />
+      <ReportsView />
     </>
   );
 }

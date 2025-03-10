@@ -8,13 +8,13 @@ import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
 
-// ----------------------------------------------------------------------
+// --------------------importamos con lazy las paginas-----------------------------
 
-export const HomePage = lazy(() => import('src/pages/home'));
-export const BlogPage = lazy(() => import('src/pages/blog'));
-export const UserPage = lazy(() => import('src/pages/user'));
+export const DashboardPage = lazy(() => import('src/pages/dashboard'));
+export const StudentsPage = lazy(() => import('src/pages/students'));
+export const ReportsPage = lazy(() => import('src/pages/reports'));
+export const SettingsPage = lazy(() => import('src/pages/settings'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
-export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
@@ -43,10 +43,10 @@ export function Router() {
         </DashboardLayout>
       ),
       children: [
-        { element: <HomePage />, index: true },
-        { path: 'user', element: <UserPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        { element: <DashboardPage />, index: true },
+        { path: 'students', element: <StudentsPage /> },
+        { path: 'reports', element: <ReportsPage /> },
+        { path: 'settings', element: <SettingsPage /> },
       ],
     },
     {

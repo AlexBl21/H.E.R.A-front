@@ -42,10 +42,12 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
   return (
     <LayoutSection
+    // contenedor principal
       /** **************************************
        * Header
        *************************************** */
       headerSection={
+        // seccion que contiene la barra de busqeuda, notificaciones y perfil
         <HeaderSection
           layoutQuery={layoutQuery}
           slotProps={{
@@ -108,7 +110,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
         />
       }
       /** **************************************
-       * Sidebar
+       * ESTO EXPORTA EL MENÚ DE LA IZQUIERDA
        *************************************** */
       sidebarSection={
         <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={_workspaces} />
@@ -135,6 +137,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
         ...sx,
       }}
     >
+    {/* ESTO EXPORTA EL MAIN DONDE SE VE TODO */}
       <Main>{children}</Main>
     </LayoutSection>
   );

@@ -18,11 +18,9 @@ import { Iconify } from 'src/components/iconify';
 export type UserProps = {
   id: string;
   name: string;
-  role: string;
-  status: string;
-  company: string;
+  semestre: number;
+  riesgo: string;
   avatarUrl: string;
-  isVerified: boolean;
 };
 
 type UserTableRowProps = {
@@ -49,30 +47,30 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
-        <TableCell component="th" scope="row">
+        {/* Nombre (alineado a la izquierda y con avatar) */}
+        <TableCell align="left" sx={{ width: 250, minWidth: 200 }}>
           <Box gap={2} display="flex" alignItems="center">
             <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
           </Box>
         </TableCell>
 
-        <TableCell>{row.company}</TableCell>
-
-        <TableCell>{row.role}</TableCell>
-
-        <TableCell align="center">
-          {row.isVerified ? (
-            <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
-          ) : (
-            '-'
-          )}
+        {/* Semestre (alineado al centro) */}
+        <TableCell align="center" sx={{ width: 100, minWidth: 80 }}>
+          {row.semestre}
         </TableCell>
 
-        <TableCell>
-          <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label>
+        {/* Nivel de Riesgo (alineado al centro) */}
+        <TableCell align="center" sx={{ width: 180, minWidth: 120 }}>
+          <Label
+            color={row.riesgo === 'alto' ? 'error' : row.riesgo === 'medio' ? 'warning' : 'success'}
+          >
+            {row.riesgo}
+          </Label>
         </TableCell>
 
-        <TableCell align="right">
+        {/* Acciones (alineado a la derecha) */}
+        <TableCell align="right" sx={{ width: 50, minWidth: 50 }}>
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
@@ -104,12 +102,12 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
         >
           <MenuItem onClick={handleClosePopover}>
             <Iconify icon="solar:pen-bold" />
-            Edit
+            Editar
           </MenuItem>
 
           <MenuItem onClick={handleClosePopover} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
-            Delete
+            Eliminar
           </MenuItem>
         </MenuList>
       </Popover>
