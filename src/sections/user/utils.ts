@@ -52,28 +52,45 @@ export function getComparator<Key extends keyof any>(
 
 // ----------------------------------------------------------------------
 
-type ApplyFilterProps = {
+type ApplyFilterParams = {
   inputData: UserProps[];
-  filterName: string;
-  comparator: (a: any, b: any) => number;
+  comparator: (a: UserProps, b: UserProps) => number;
+  filterName?: string;
+  filterSemestre?: number | '';
+  filterRiesgo?: string;
 };
 
-export function applyFilter({ inputData, comparator, filterName }: ApplyFilterProps) {
-  const stabilizedThis = inputData.map((el, index) => [el, index] as const);
+export function applyFilter({
+  inputData,
+  comparator,
+  filterName = '',
+  filterSemestre = '',
+  filterRiesgo = '',
+}: ApplyFilterParams): UserProps[] {
+  let filteredData = [...inputData];
 
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
+  // Ordenamos los datos con el comparador
+  filteredData.sort(comparator);
 
-  inputData = stabilizedThis.map((el) => el[0]);
-
+  // Filtrar por nombre
   if (filterName) {
-    inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+    filteredData = filteredData.filter((user) =>
+      user.name.toLowerCase().includes(filterName.toLowerCase())
     );
   }
 
-  return inputData;
+  // Filtrar por semestre
+  if (filterSemestre !== '') {
+    filteredData = filteredData.filter((user) => user.semestre === filterSemestre);
+  }
+
+  // Filtrar por nivel de riesgo
+  if (filterRiesgo) {
+    filteredData = filteredData.filter(
+      (user) => user.riesgo.toLowerCase().trim() === filterRiesgo.toLowerCase().trim()
+    );
+  }
+
+
+  return filteredData;
 }

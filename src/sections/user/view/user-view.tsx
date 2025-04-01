@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -8,13 +7,10 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
-
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
-
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
@@ -24,17 +20,20 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
 
-// ----------------------------------------------------------------------
-
 export function UserView() {
   const table = useTable();
 
   const [filterName, setFilterName] = useState('');
+  const [filterSemestre, setFilterSemestre] = useState<number | ''>(''); 
+  const [filterRiesgo, setFilterRiesgo] = useState<string>('');
 
+  // Aplicamos los filtros con la nueva lógica
   const dataFiltered: UserProps[] = applyFilter({
     inputData: _users,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
+    filterSemestre,
+    filterRiesgo,
   });
 
   const notFound = !dataFiltered.length && !!filterName;
@@ -58,8 +57,20 @@ export function UserView() {
         <UserTableToolbar
           numSelected={table.selected.length}
           filterName={filterName}
-          onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
+          onFilterName={(event) => {
             setFilterName(event.target.value);
+            table.onResetPage();
+          }}
+          filterSemestre={filterSemestre}
+          onFilterSemestre={(event) => {
+            const value = event.target.value ? Number(event.target.value) : '';
+            console.log("filterSemestre:", value);  // Verificación
+            setFilterSemestre(value);
+            table.onResetPage();
+          }}
+          filterRiesgo={filterRiesgo}
+          onFilterRiesgo={(event) => {
+            setFilterRiesgo(event.target.value);
             table.onResetPage();
           }}
         />
@@ -126,8 +137,6 @@ export function UserView() {
     </DashboardContent>
   );
 }
-
-// ----------------------------------------------------------------------
 
 export function useTable() {
   const [page, setPage] = useState(0);

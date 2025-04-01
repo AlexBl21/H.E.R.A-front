@@ -4,63 +4,74 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
-
+import Box from '@mui/material/Box';
 import { Iconify } from 'src/components/iconify';
+import { TextField, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
 
 // ----------------------------------------------------------------------
 
-type UserTableToolbarProps = {
-  numSelected: number;
-  filterName: string;
-  onFilterName: (event: React.ChangeEvent<HTMLInputElement>) => void;
-};
+// Definimos las propiedades esperadas en el componente UserTableToolbar
+interface UserTableToolbarProps {
+  numSelected: number; // Cantidad de elementos seleccionados en la tabla
+  filterName: string; // Filtro para búsqueda por nombre
+  onFilterName: (event: React.ChangeEvent<HTMLInputElement>) => void; // Manejador de cambio para el filtro de nombre
+  filterSemestre: number | ''; // Filtro por semestre, puede ser un número o vacío
+  onFilterSemestre: (event: SelectChangeEvent<string>) => void; // Manejador de cambio para el filtro de semestre
+  filterRiesgo: string; // Filtro por riesgo (bajo, medio, alto)
+  onFilterRiesgo: (event: SelectChangeEvent<string>) => void; // Manejador de cambio para el filtro de riesgo
+}
 
-export function UserTableToolbar({ numSelected, filterName, onFilterName }: UserTableToolbarProps) {
+export function UserTableToolbar({
+  numSelected,
+  filterName,
+  onFilterName,
+  filterSemestre,
+  onFilterSemestre,
+  filterRiesgo,
+  onFilterRiesgo,
+}: UserTableToolbarProps) {
   return (
-    <Toolbar
-      sx={{
-        height: 96,
-        display: 'flex',
-        justifyContent: 'space-between',
-        p: (theme) => theme.spacing(0, 1, 0, 3),
-        ...(numSelected > 0 && {
-          color: 'primary.main',
-          bgcolor: 'primary.lighter',
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography component="div" variant="subtitle1">
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <OutlinedInput
-          fullWidth
-          value={filterName}
-          onChange={onFilterName}
-          placeholder="Search user..."
-          startAdornment={
-            <InputAdornment position="start">
-              <Iconify width={20} icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
-            </InputAdornment>
-          }
-          sx={{ maxWidth: 320 }}
-        />
-      )}
+    <Box display="flex" gap={2} p={2} alignItems="center">
+      {/* Filtro por Nombre */}
+      <TextField
+        label="Buscar por nombre"
+        variant="outlined"
+        value={filterName}
+        onChange={onFilterName}
+      />
 
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <Iconify icon="solar:trash-bin-trash-bold" />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <Iconify icon="ic:round-filter-list" />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
+      {/* Filtro por Semestre */}
+      <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+        <InputLabel>Semestre</InputLabel>
+        <Select
+          value={filterSemestre.toString()} // Convertimos el número a string para evitar conflictos
+          onChange={(event) => onFilterSemestre(event)}
+          label="Semestre"
+        >
+          <MenuItem value="">Todos</MenuItem>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((sem) => (
+            <MenuItem key={sem} value={sem.toString()}>
+              {sem}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {/* Filtro por Riesgo */}
+      <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+        <InputLabel>Riesgo</InputLabel>
+        <Select
+          value={filterRiesgo}
+          onChange={onFilterRiesgo}
+          label="Riesgo"
+        >
+          <MenuItem value="">Todos</MenuItem>
+          <MenuItem value="bajo">Bajo</MenuItem>
+          <MenuItem value="medio">Medio</MenuItem>
+          <MenuItem value="alto">Alto</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
   );
 }
