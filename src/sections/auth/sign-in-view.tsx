@@ -21,7 +21,7 @@ export function SignInView() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSignIn = useCallback(() => {
-    router.push('/');
+    router.push('/dashboard');
   }, [router]);
 
   const renderForm = (
@@ -76,7 +76,7 @@ export function SignInView() {
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
         <Typography variant="h5">Sign in</Typography>
         <Typography variant="body2" color="text.secondary">
-          Don’t have an account?
+          Don&apos;t have an account?
           <Link variant="subtitle2" sx={{ ml: 0.5 }}>
             Get started
           </Link>

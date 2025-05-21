@@ -47,27 +47,25 @@ export function ReportsView() {
             Selecciona el archivo Excel que contiene los datos de rendimiento.
           </Typography>
 
-          {/* Input de tipo file, oculto */}
-          <input
-            type="file"
-            accept=".xlsx,.xls" // Permite solo archivos de Excel
-            id="file-upload"
-            onChange={handleFileChange}
-            style={{ display: "none" }} // Oculta el input de carga de archivos
-          />
-
-          {/* Botón para activar la carga de archivos */}
-          <label htmlFor="file-upload">
+          <Box component="form" role="presentation" sx={{ textAlign: 'center' }}>
             <Button
+              component="label"
               variant="contained"
               color="primary"
               startIcon={<CloudUploadIcon />}
-              component="span"
-              sx={{ padding: "12px 0", marginTop: 2, width: "200px" }} // Ajusta el padding del botón y la separación
+              htmlFor="file-upload"
             >
-              Cargar archivo
+              Cargar Reporte
+              <input
+                id="file-upload"
+                type="file"
+                accept=".csv,.xlsx"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+                aria-label="Cargar reporte"
+              />
             </Button>
-          </label>
+          </Box>
 
           {/* Filtros */}
           <Box sx={{ width: '100%', marginTop: 3 }}>

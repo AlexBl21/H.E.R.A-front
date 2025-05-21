@@ -10,12 +10,12 @@ const icon = (name: string) => (
 export const navData = [
   {
     title: 'Dashboard',
-    path: '/',
+    path: '/dashboard',
     icon: icon('ic-home'),
   },
   {
     title: 'Students',
-    path: '/students',
+    path: '/dashboard/students',
     icon: icon('ic-user'),
   },
   // {
@@ -35,25 +35,32 @@ export const navData = [
   // },
 
   {
-    title: 'reports',
-    path: '/reports',
+    title: 'Reports',
+    path: '/dashboard/reports',
     icon: icon('ic-analytics'),
   },
 
   {
-    title: 'settings',
-    path: '/settings',
+    title: 'Settings',
+    path: '/dashboard/settings',
     icon: icon('ic-settings'),
   },
+  {
+    title: 'Logout',
+    path: '/sign-in',
+    icon: icon('ic-lock'),
+    bottom: true,
+  },
+];
 
+// Rutas que existen pero no se muestran en el menú
+export const hiddenRoutes = [
   {
     title: 'Sign in',
     path: '/sign-in',
-    icon: icon('ic-lock'),
   },
   {
     title: 'Not found',
     path: '/404',
-    icon: icon('ic-disabled'),
   },
 ];

@@ -16,19 +16,33 @@ import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
+import { StudentModal } from '../student-modal';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
 
 export function UserView() {
+  const [openModal, setOpenModal] = useState(false);
   const table = useTable();
-
   const [filterName, setFilterName] = useState('');
   const [filterSemestre, setFilterSemestre] = useState<number | ''>(''); 
   const [filterRiesgo, setFilterRiesgo] = useState<string>('');
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleRegisterStudent = (studentData: { name: string; semester: number; riskLevel: string }) => {
+    // Aquí se implementará la lógica para registrar el estudiante
+    console.log('Nuevo estudiante:', studentData);
+  };
+
   // Aplicamos los filtros con la nueva lógica
-  const dataFiltered: UserProps[] = applyFilter({
+  const dataFiltered = applyFilter({
     inputData: _users,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
@@ -42,14 +56,15 @@ export function UserView() {
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Users
+          Estudiantes
         </Typography>
         <Button
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="mingcute:add-line" />}
+          onClick={handleOpenModal}
         >
-          New user
+          Registrar Estudiante
         </Button>
       </Box>
 
@@ -64,7 +79,6 @@ export function UserView() {
           filterSemestre={filterSemestre}
           onFilterSemestre={(event) => {
             const value = event.target.value ? Number(event.target.value) : '';
-            console.log("filterSemestre:", value);  // Verificación
             setFilterSemestre(value);
             table.onResetPage();
           }}
@@ -77,7 +91,7 @@ export function UserView() {
 
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
+            <Table>
               <UserTableHead
                 order={table.order}
                 orderBy={table.orderBy}
@@ -91,11 +105,10 @@ export function UserView() {
                   )
                 }
                 headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
-                  { id: '' },
+                  { id: 'name', label: 'Nombre' },
+                  { id: 'semester', label: 'Semestre', align: 'center' },
+                  { id: 'riskLevel', label: 'Nivel de Riesgo', align: 'center' },
+                  { id: 'actions', label: 'Acciones', align: 'right' },
                 ]}
               />
               <TableBody>
@@ -125,15 +138,21 @@ export function UserView() {
         </Scrollbar>
 
         <TablePagination
-          component="div"
           page={table.page}
-          count={_users.length}
+          component="div"
+          count={dataFiltered.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
           rowsPerPageOptions={[5, 10, 25]}
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
+
+      <StudentModal
+        open={openModal}
+        onClose={handleCloseModal}
+        onSubmit={handleRegisterStudent}
+      />
     </DashboardContent>
   );
 }

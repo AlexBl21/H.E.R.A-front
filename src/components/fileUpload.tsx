@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { Button, Card, CardContent, Typography, Grid } from '@mui/material';
+import { Button, Card, CardContent, Typography, Grid, Box } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 export function FileUpload() {
@@ -23,28 +23,28 @@ export function FileUpload() {
               Selecciona el archivo Excel que contiene los datos de rendimiento.
             </Typography>
 
-            {/* Input de tipo file, oculto */}
-            <input
-              type="file"
-              accept=".xlsx,.xls" // Permite solo archivos de Excel
-              id="file-upload"
-              onChange={handleFileChange}
-              style={{ display: "none" }} // Oculta el input de carga de archivos
-            />
-            
-            {/* Botón para activar la carga de archivos */}
-            <label htmlFor="file-upload">
+            <Box 
+              component="form" 
+              role="presentation" 
+              sx={{ textAlign: 'center' }}
+            >
               <Button
+                component="label"
                 variant="contained"
                 color="primary"
-                startIcon={<CloudUploadIcon />}
-                component="span"
-                fullWidth
-                sx={{ padding: "12px 0" }} // Ajusta el padding del botón
+                htmlFor="file-upload"
               >
-                Cargar archivo
+                Cargar Archivo
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept=".csv,.xlsx"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                  aria-label="Cargar archivo"
+                />
               </Button>
-            </label>
+            </Box>
           </CardContent>
         </Card>
       </Grid>

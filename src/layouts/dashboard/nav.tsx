@@ -28,6 +28,7 @@ export type NavContentProps = {
     title: string;
     icon: React.ReactNode;
     info?: React.ReactNode;
+    bottom?: boolean;
   }[];
   slots?: {
     topArea?: React.ReactNode;
@@ -116,25 +117,22 @@ export function NavMobile({
 export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
   const pathname = usePathname();
 
+  const normalItems = data.filter(item => !item.bottom);
+  const bottomItems = data.filter(item => item.bottom);
+
   return (
     <>
-      {/* ESTO EXPORTA EL LOGO */}
-      <Logo /> 
+      <Logo />
 
       {slots?.topArea}
 
-      {/* ESTO DESPLIEGA EL DESPLEGABLES DE EQUIPOS */}
-      {/* <WorkspacesPopover data={workspaces} sx={{ my: 2 }} /> */}
-
-      {/* ESTO EXPORTA TODO LO DEL MENÚ, SE DEBE EDITAR EL COMPONENTE DE SCROLLBAR */}
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">
-            {data.map((item) => {
+            {normalItems.map((item) => {
               const isActived = item.path === pathname;
 
               return (
-                
                 <ListItem disableGutters disablePadding key={item.title}>
                   <ListItemButton
                     disableGutters
@@ -160,12 +158,10 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
                       }),
                     }}
                   >
-                    {/* ESTO DESPLIEGA ICONOS DE LAS OPCIONES DEL MENÚ */}
                     <Box component="span" sx={{ width: 24, height: 24 }}>
                       {item.icon}
                     </Box>
                     
-                    {/* DESPLIEGA TEXTO DEL MENÚ */}
                     <Box component="span" flexGrow={1}>
                       {item.title}
                     </Box>
@@ -181,6 +177,48 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
       {slots?.bottomArea}
 
+      {bottomItems.length > 0 && (
+        <Box 
+          component="ul" 
+          sx={{ 
+            p: 2,
+            borderTop: '1px dashed',
+            borderColor: 'divider'
+          }}
+        >
+          {bottomItems.map((item) => (
+            <ListItem disableGutters disablePadding key={item.title}>
+              <ListItemButton
+                disableGutters
+                component={RouterLink}
+                href={item.path}
+                sx={{
+                  pl: 2,
+                  py: 1,
+                  gap: 2,
+                  pr: 1.5,
+                  borderRadius: 0.75,
+                  typography: 'body2',
+                  fontWeight: 'fontWeightMedium',
+                  color: 'error.main',
+                  minHeight: 'var(--layout-nav-item-height)',
+                  '&:hover': {
+                    bgcolor: 'error.lighter',
+                  },
+                }}
+              >
+                <Box component="span" sx={{ width: 24, height: 24 }}>
+                  {item.icon}
+                </Box>
+                
+                <Box component="span" flexGrow={1}>
+                  {item.title}
+                </Box>
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </Box>
+      )}
     </>
   );
 }
