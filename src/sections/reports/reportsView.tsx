@@ -4,17 +4,32 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { uploadExcel } from 'src/utils/authService';
 
 export function ReportsView() {
   const [selectedChartType, setSelectedChartType] = useState<string>('');
   const [selectedReportType, setSelectedReportType] = useState<string>('');
   const [dateRange, setDateRange] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log("Archivo seleccionado:", file);
-      // Aquí puedes manejar el archivo subido, por ejemplo, enviarlo al backend o mostrar un preview.
+      setUploading(true);
+      setUploadMessage(null);
+      setUploadError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No autenticado');
+        const res = await uploadExcel(file, token);
+        setUploadMessage(res.message);
+      } catch (err: any) {
+        setUploadError(err.message);
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
@@ -54,8 +69,9 @@ export function ReportsView() {
               color="primary"
               startIcon={<CloudUploadIcon />}
               htmlFor="file-upload"
+              disabled={uploading}
             >
-              Cargar Reporte
+              {uploading ? 'Cargando...' : 'Cargar Reporte'}
               <input
                 id="file-upload"
                 type="file"
@@ -65,6 +81,16 @@ export function ReportsView() {
                 aria-label="Cargar reporte"
               />
             </Button>
+            {uploadMessage && (
+              <Box sx={{ mt: 2, bgcolor: 'success.lighter', color: 'success.dark', borderRadius: 1, px: 2, py: 1, fontWeight: 'bold', fontSize: 15 }}>
+                {uploadMessage}
+              </Box>
+            )}
+            {uploadError && (
+              <Box sx={{ mt: 2, bgcolor: 'error.lighter', color: 'error.dark', borderRadius: 1, px: 2, py: 1, fontWeight: 'bold', fontSize: 15 }}>
+                {uploadError}
+              </Box>
+            )}
           </Box>
 
           {/* Filtros */}

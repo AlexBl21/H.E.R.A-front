@@ -41,12 +41,7 @@ export function UserTableHead({
           />
         </TableCell>
 
-        {[
-          { id: 'name', label: 'Nombre', align: 'left', width: 250, minWidth: 200 },
-          { id: 'semester', label: 'Semestre', align: 'center', width: 100, minWidth: 80 },
-          { id: 'riskLevel', label: 'Nivel de Riesgo', align: 'center', width: 180, minWidth: 120 },
-          { id: 'actions', label: '', align: 'right', width: 50, minWidth: 50 },
-        ].map((headCell) => (
+        {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}
             sx={{ width: headCell.width, minWidth: headCell.minWidth, textAlign: headCell.align }}

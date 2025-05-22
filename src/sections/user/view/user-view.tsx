@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -7,10 +7,10 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
+import { fetchEstudiantes } from 'src/utils/authService';
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
@@ -18,7 +18,6 @@ import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { StudentModal } from '../student-modal';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-
 import type { UserProps } from '../user-table-row';
 
 export function UserView() {
@@ -27,6 +26,9 @@ export function UserView() {
   const [filterName, setFilterName] = useState('');
   const [filterSemestre, setFilterSemestre] = useState<number | ''>(''); 
   const [filterRiesgo, setFilterRiesgo] = useState<string>('');
+  const [estudiantes, setEstudiantes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -41,9 +43,27 @@ export function UserView() {
     console.log('Nuevo estudiante:', studentData);
   };
 
-  // Aplicamos los filtros con la nueva lógica
+  useEffect(() => {
+    const getEstudiantes = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No autenticado');
+        const res = await fetchEstudiantes(token);
+        setEstudiantes(res.estudiantes);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getEstudiantes();
+  }, []);
+
+  // Reemplazar _users por estudiantes en la tabla
   const dataFiltered = applyFilter({
-    inputData: _users,
+    inputData: estudiantes,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
     filterSemestre,
@@ -95,43 +115,57 @@ export function UserView() {
               <UserTableHead
                 order={table.order}
                 orderBy={table.orderBy}
-                rowCount={_users.length}
+                rowCount={estudiantes.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
                 onSelectAllRows={(checked) =>
                   table.onSelectAllRows(
                     checked,
-                    _users.map((user) => user.id)
+                    estudiantes.map((user) => user.codigo)
                   )
                 }
                 headLabel={[
-                  { id: 'name', label: 'Nombre' },
-                  { id: 'semester', label: 'Semestre', align: 'center' },
-                  { id: 'riskLevel', label: 'Nivel de Riesgo', align: 'center' },
-                  { id: 'actions', label: 'Acciones', align: 'right' },
+                  { id: 'codigo', label: 'Código', align: 'center' },
+                  { id: 'name', label: 'Nombre', align: 'center' },
+                  { id: 'semestre', label: 'Semestre', align: 'center' },
+                  { id: 'email', label: 'Correo', align: 'center' },
+                  { id: 'riesgo', label: 'Nivel de Riesgo', align: 'center' },
+                  { id: 'actions', label: 'Acciones', align: 'center' },
                 ]}
               />
               <TableBody>
-                {dataFiltered
+                {loading ? (
+                  <tr><td colSpan={4}><Box sx={{ p: 3, textAlign: 'center' }}>Cargando...</Box></td></tr>
+                ) : error ? (
+                  <tr><td colSpan={4}><Box sx={{ p: 3, textAlign: 'center', color: 'error.main' }}>{error}</Box></td></tr>
+                ) : dataFiltered
                   .slice(
                     table.page * table.rowsPerPage,
                     table.page * table.rowsPerPage + table.rowsPerPage
                   )
                   .map((row) => (
                     <UserTableRow
-                      key={row.id}
-                      row={row}
-                      selected={table.selected.includes(row.id)}
-                      onSelectRow={() => table.onSelectRow(row.id)}
+                      key={(row as any).codigo}
+                      row={{
+                        id: (row as any).codigo,
+                        name: (row as any).nombre,
+                        codigo: (row as any).codigo,
+                        semestre: Number((row as any).semestre),
+                        email: (row as any).email_institucional,
+                        riesgo: ((row as any).nivel_riesgo || '').toLowerCase(),
+                        avatarUrl: '',
+                      }}
+                      selected={table.selected.includes((row as any).codigo)}
+                      onSelectRow={() => table.onSelectRow((row as any).codigo)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={68}
-                  emptyRows={emptyRows(table.page, table.rowsPerPage, _users.length)}
+                  emptyRows={emptyRows(table.page, table.rowsPerPage, estudiantes.length)}
                 />
 
-                {notFound && <TableNoData searchQuery={filterName} />}
+                {(!loading && !error && !dataFiltered.length && !!filterName) && <TableNoData searchQuery={filterName} />}
               </TableBody>
             </Table>
           </TableContainer>

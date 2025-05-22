@@ -17,7 +17,9 @@ import { Iconify } from 'src/components/iconify';
 
 export type UserProps = {
   id: string;
+  codigo: string;
   name: string;
+  email: string;
   semestre: number;
   riesgo: string;
   avatarUrl: string;
@@ -47,12 +49,22 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
+        {/* Código (alineado al centro) */}
+        <TableCell align="center" sx={{ width: 120, minWidth: 100 }}>
+          {row.codigo}
+        </TableCell>
+
         {/* Nombre (alineado a la izquierda y con avatar) */}
         <TableCell align="left" sx={{ width: 250, minWidth: 200 }}>
           <Box gap={2} display="flex" alignItems="center">
             <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
           </Box>
+        </TableCell>
+
+        {/* Correo (alineado al centro) */}
+        <TableCell align="center" sx={{ width: 220, minWidth: 180 }}>
+          {row.email}
         </TableCell>
 
         {/* Semestre (alineado al centro) */}
