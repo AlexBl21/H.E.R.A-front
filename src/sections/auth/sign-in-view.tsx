@@ -12,6 +12,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { Iconify } from 'src/components/iconify';
+import { login } from 'src/utils/authService';
 
 // ----------------------------------------------------------------------
 
@@ -19,20 +20,37 @@ export function SignInView() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSignIn = useCallback(() => {
-    router.push('/dashboard');
-  }, [router]);
+  const handleSignIn = useCallback(async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const data = await login(email, password);
+      localStorage.setItem('token', data.access_token);
+      router.push('/dashboard');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [email, password, router]);
 
   const renderForm = (
-    <Box display="flex" flexDirection="column" alignItems="flex-end">
+    <Box component="form" display="flex" flexDirection="column" alignItems="flex-end" onSubmit={handleSignIn}>
       <TextField
         fullWidth
         name="email"
         label="Email address"
-        defaultValue="hello@gmail.com"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
+        required
       />
 
       <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
@@ -43,7 +61,8 @@ export function SignInView() {
         fullWidth
         name="password"
         label="Password"
-        defaultValue="@demo1234"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
         InputProps={{
@@ -56,7 +75,30 @@ export function SignInView() {
           ),
         }}
         sx={{ mb: 3 }}
+        required
       />
+
+      {error && (
+        <Box sx={{ width: '100%', mb: 2 }}>
+          <Box
+            sx={{
+              bgcolor: 'error.lighter',
+              color: 'error.dark',
+              borderRadius: 1,
+              px: 2,
+              py: 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              fontWeight: 'bold',
+              fontSize: 15,
+            }}
+          >
+            <Iconify icon="solar:danger-triangle-bold" width={22} />
+            {error}
+          </Box>
+        </Box>
+      )}
 
       <LoadingButton
         fullWidth
@@ -64,7 +106,7 @@ export function SignInView() {
         type="submit"
         color="inherit"
         variant="contained"
-        onClick={handleSignIn}
+        loading={loading}
       >
         Sign in
       </LoadingButton>
@@ -97,12 +139,6 @@ export function SignInView() {
       <Box gap={1} display="flex" justifyContent="center">
         <IconButton color="inherit">
           <Iconify icon="logos:google-icon" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="eva:github-fill" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="ri:twitter-x-fill" />
         </IconButton>
       </Box>
     </>
