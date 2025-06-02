@@ -1,5 +1,7 @@
+const BACKERND_URL = `${import.meta.env.VITE_URL_BACKEND}` || `http://localhost:8000`;
+
 export async function login(username: string, password: string) {
-  const response = await fetch('http://localhost:8000/auth/login', {
+  const response = await fetch(`${BACKERND_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -19,7 +21,7 @@ export async function uploadExcel(file: File, token: string) {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch('http://localhost:8000/estudiantes/cargar-excel/', {
+  const response = await fetch(`${BACKERND_URL}/estudiantes/cargar-excel/`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`
@@ -36,7 +38,7 @@ export async function uploadExcel(file: File, token: string) {
 }
 
 export async function fetchEstudiantes(token: string) {
-  const response = await fetch('http://localhost:8000/estudiantes/mis-estudiantes/?skip=0&limit=100', {
+  const response = await fetch(`${BACKERND_URL}/estudiantes/mis-estudiantes/?skip=0&limit=100`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
