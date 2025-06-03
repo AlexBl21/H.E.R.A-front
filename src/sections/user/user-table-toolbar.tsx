@@ -67,9 +67,9 @@ export function UserTableToolbar({
           label="Riesgo"
         >
           <MenuItem value="">Todos</MenuItem>
-          <MenuItem value="bajo">Bajo</MenuItem>
-          <MenuItem value="medio">Medio</MenuItem>
-          <MenuItem value="alto">Alto</MenuItem>
+          <MenuItem value="Bajo">Bajo</MenuItem>
+          <MenuItem value="Medio">Medio</MenuItem>
+          <MenuItem value="Alto">Alto</MenuItem>
         </Select>
       </FormControl>
     </Box>

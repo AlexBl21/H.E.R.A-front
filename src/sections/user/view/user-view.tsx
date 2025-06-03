@@ -50,7 +50,14 @@ export function UserView() {
       try {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No autenticado');
-        const res = await fetchEstudiantes(token);
+        
+        // Construir objeto de filtros
+        const filters: any = {};
+        if (filterName) filters.nombre = filterName;
+        if (filterSemestre !== '') filters.semestre = filterSemestre.toString();
+        if (filterRiesgo) filters.nivel_riesgo = filterRiesgo;
+        
+        const res = await fetchEstudiantes(token, filters);
         setEstudiantes(res.estudiantes);
       } catch (err: any) {
         setError(err.message);
@@ -59,16 +66,10 @@ export function UserView() {
       }
     };
     getEstudiantes();
-  }, []);
+  }, [filterName, filterSemestre, filterRiesgo]); // Agregamos las dependencias para que se actualice cuando cambien los filtros
 
-  // Reemplazar _users por estudiantes en la tabla
-  const dataFiltered = applyFilter({
-    inputData: estudiantes,
-    comparator: getComparator(table.order, table.orderBy),
-    filterName,
-    filterSemestre,
-    filterRiesgo,
-  });
+  // Ya no necesitamos aplicar filtros en el frontend porque vienen filtrados del backend
+  const dataFiltered = estudiantes;
 
   const notFound = !dataFiltered.length && !!filterName;
 
