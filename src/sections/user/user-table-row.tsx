@@ -12,6 +12,7 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
+import { DeleteConfirmationModal } from './delete-confirmation-modal';
 
 // ----------------------------------------------------------------------
 
@@ -29,10 +30,14 @@ type UserTableRowProps = {
   row: UserProps;
   selected: boolean;
   onSelectRow: () => void;
+  onDelete?: (codigoEstudiante: string) => void;
+  onEdit?: (codigoEstudiante: string) => void;
+  deleting?: boolean;
 };
 
-export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) {
+export function UserTableRow({ row, selected, onSelectRow, onDelete, onEdit, deleting = false }: UserTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenPopover(event.currentTarget);
@@ -41,6 +46,30 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
   const handleClosePopover = useCallback(() => {
     setOpenPopover(null);
   }, []);
+
+  const handleOpenDeleteModal = useCallback(() => {
+    setOpenDeleteModal(true);
+    setOpenPopover(null);
+  }, []);
+
+  const handleCloseDeleteModal = useCallback(() => {
+    setOpenDeleteModal(false);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (onDelete) {
+      // Usar el código del estudiante directamente
+      onDelete(row.codigo);
+    }
+    setOpenDeleteModal(false);
+  }, [onDelete, row.codigo]);
+
+  const handleEdit = useCallback(() => {
+    if (onEdit) {
+      onEdit(row.codigo);
+    }
+    setOpenPopover(null);
+  }, [onEdit, row.codigo]);
 
   return (
     <>
@@ -112,17 +141,26 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
             },
           }}
         >
-          <MenuItem onClick={handleClosePopover}>
+          <MenuItem onClick={handleEdit}>
             <Iconify icon="solar:pen-bold" />
             Editar
           </MenuItem>
 
-          <MenuItem onClick={handleClosePopover} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={handleOpenDeleteModal} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
             Eliminar
           </MenuItem>
         </MenuList>
       </Popover>
+
+      <DeleteConfirmationModal
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        studentName={row.name}
+        studentCode={row.codigo}
+        loading={deleting}
+      />
     </>
   );
 }

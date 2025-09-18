@@ -10,18 +10,21 @@ import TablePagination from '@mui/material/TablePagination';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
-import { fetchEstudiantes } from 'src/utils/authService';
+import { fetchEstudiantes, deleteEstudiante, createEstudiante, fetchEstudianteByCodigo, updateEstudiante } from 'src/utils/authService';
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
-import { StudentModal } from '../student-modal';
+import StudentModal from '../student-modal';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 import type { UserProps } from '../user-table-row';
 
 export function UserView() {
   const [openModal, setOpenModal] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [selectedCodigo, setSelectedCodigo] = useState<string | null>(null);
+  const [initialStudentData, setInitialStudentData] = useState<any | null>(null);
   const table = useTable();
   const [filterName, setFilterName] = useState('');
   const [filterSemestre, setFilterSemestre] = useState<number | ''>(''); 
@@ -29,18 +32,188 @@ export function UserView() {
   const [estudiantes, setEstudiantes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   const handleOpenModal = () => {
+    setModalMode('create');
+    setInitialStudentData(null);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setCreateError('');
+  };
+  const handleOpenEdit = async (codigo: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No autenticado');
+      setModalMode('edit');
+      setSelectedCodigo(codigo);
+      const data = await fetchEstudianteByCodigo(codigo, token);
+      setInitialStudentData({
+        codigo: data.codigo,
+        nombre: data.nombre,
+        tipo_documento_id: data.tipo_documento_id,
+        documento: data.documento,
+        semestre: data.semestre,
+        pensum: data.pensum,
+        ingreso: data.ingreso,
+        estado_matricula_id: data.estado_matricula_id,
+        celular: data.celular ?? '',
+        email_personal: data.email_personal ?? '',
+        email_institucional: data.email_institucional,
+        colegio_egresado_id: data.colegio_egresado_id,
+        municipio_nacimiento_id: data.municipio_nacimiento_id,
+        // promedio viene aparte; no lo devuelve el detalle base
+      });
+      setOpenModal(true);
+    } catch (err: any) {
+      setCreateError(err.message);
+    }
   };
 
-  const handleRegisterStudent = (studentData: { name: string; semester: number; riskLevel: string }) => {
-    // Aquí se implementará la lógica para registrar el estudiante
-    console.log('Nuevo estudiante:', studentData);
+  const handleSubmitEdit = async (studentData: any) => {
+    setCreating(true);
+    setCreateError('');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No autenticado');
+
+      // Preparar payload de actualización (solo campos editables que hayan cambiado)
+      type EditableKey = 'nombre' | 'semestre' | 'pensum' | 'ingreso' | 'estado_matricula_id' | 'celular' | 'email_personal' | 'email_institucional' | 'colegio_egresado_id' | 'municipio_nacimiento_id' | 'promedio';
+      type UpdatePayload = {
+        nombre?: string;
+        semestre?: string;
+        pensum?: string;
+        ingreso?: string;
+        estado_matricula_id?: number;
+        celular?: string | null;
+        email_personal?: string | null;
+        email_institucional?: string;
+        colegio_egresado_id?: number;
+        municipio_nacimiento_id?: number;
+        promedio?: number | null;
+      };
+      const editableKeys: EditableKey[] = [
+        'nombre','semestre','pensum','ingreso','estado_matricula_id','celular','email_personal','email_institucional','colegio_egresado_id','municipio_nacimiento_id','promedio'
+      ];
+      const updates: UpdatePayload = {};
+      editableKeys.forEach((key) => {
+        const newValue = (studentData as Record<string, unknown>)[key];
+        const oldValue = (initialStudentData as Record<string, unknown> | null)?.[key] ?? '';
+        if (newValue !== undefined && newValue !== oldValue) {
+          switch (key) {
+            case 'estado_matricula_id':
+            case 'colegio_egresado_id':
+            case 'municipio_nacimiento_id':
+              (updates as any)[key] = Number(newValue);
+              break;
+            case 'promedio':
+              (updates as any)[key] = newValue === '' ? null : parseFloat(String(newValue));
+              break;
+            case 'celular':
+            case 'email_personal':
+              (updates as any)[key] = newValue === '' ? null : String(newValue);
+              break;
+            case 'nombre':
+            case 'semestre':
+            case 'pensum':
+            case 'ingreso':
+            case 'email_institucional':
+              (updates as any)[key] = String(newValue);
+              break;
+            default:
+              (updates as any)[key] = newValue as any;
+          }
+        }
+      });
+
+      await updateEstudiante(selectedCodigo as string, updates, token);
+
+      // Refrescar lista
+      const filters: any = {};
+      if (filterName) filters.nombre = filterName;
+      if (filterSemestre !== '') filters.semestre = filterSemestre.toString();
+      if (filterRiesgo) filters.nivel_riesgo = filterRiesgo;
+      const res = await fetchEstudiantes(token, filters);
+      setEstudiantes(res.estudiantes);
+
+      setOpenModal(false);
+    } catch (err: any) {
+      setCreateError(err.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleRegisterStudent = async (studentData: any) => {
+    console.log('handleRegisterStudent ejecutado con datos:', studentData);
+    setCreating(true);
+    setCreateError('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No autenticado');
+      
+      // Convertir promedio a número
+      const processedData = {
+        ...studentData,
+        promedio: parseFloat(studentData.promedio as string)
+      };
+      
+      console.log('Creando estudiante...');
+      await createEstudiante(processedData, token);
+      console.log('Estudiante creado exitosamente');
+      
+      // Actualizar la lista de estudiantes después de crear
+      const filters: any = {};
+      if (filterName) filters.nombre = filterName;
+      if (filterSemestre !== '') filters.semestre = filterSemestre.toString();
+      if (filterRiesgo) filters.nivel_riesgo = filterRiesgo;
+      
+      console.log('Actualizando lista de estudiantes...');
+      const res = await fetchEstudiantes(token, filters);
+      setEstudiantes(res.estudiantes);
+      
+      // Cerrar el modal
+      setOpenModal(false);
+      console.log('Modal cerrado');
+      
+    } catch (err: any) {
+      console.error('Error al crear estudiante:', err);
+      setCreateError(err.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDeleteStudent = async (codigoEstudiante: string) => {
+    setDeleting(true);
+    setError('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No autenticado');
+      
+      await deleteEstudiante(codigoEstudiante, token);
+      
+      // Actualizar la lista de estudiantes después de eliminar
+      const filters: any = {};
+      if (filterName) filters.nombre = filterName;
+      if (filterSemestre !== '') filters.semestre = filterSemestre.toString();
+      if (filterRiesgo) filters.nivel_riesgo = filterRiesgo;
+      
+      const res = await fetchEstudiantes(token, filters);
+      setEstudiantes(res.estudiantes);
+      
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   useEffect(() => {
@@ -128,8 +301,8 @@ export function UserView() {
                 headLabel={[
                   { id: 'codigo', label: 'Código', align: 'center' },
                   { id: 'name', label: 'Nombre', align: 'center' },
-                  { id: 'semestre', label: 'Semestre', align: 'center' },
                   { id: 'email', label: 'Correo', align: 'center' },
+                  { id: 'semestre', label: 'Semestre', align: 'center' },
                   { id: 'riesgo', label: 'Nivel de Riesgo', align: 'center' },
                   { id: 'actions', label: 'Acciones', align: 'center' },
                 ]}
@@ -148,7 +321,7 @@ export function UserView() {
                     <UserTableRow
                       key={(row as any).codigo}
                       row={{
-                        id: (row as any).codigo,
+                        id: (row as any).id || (row as any).codigo, // Usar id real si está disponible, sino el código
                         name: (row as any).nombre,
                         codigo: (row as any).codigo,
                         semestre: Number((row as any).semestre),
@@ -158,6 +331,9 @@ export function UserView() {
                       }}
                       selected={table.selected.includes((row as any).codigo)}
                       onSelectRow={() => table.onSelectRow((row as any).codigo)}
+                      onDelete={handleDeleteStudent}
+                      onEdit={handleOpenEdit}
+                      deleting={deleting}
                     />
                   ))}
 
@@ -186,7 +362,11 @@ export function UserView() {
       <StudentModal
         open={openModal}
         onClose={handleCloseModal}
-        onSubmit={handleRegisterStudent}
+        onSubmit={modalMode === 'edit' ? handleSubmitEdit : handleRegisterStudent}
+        loading={creating}
+        error={createError}
+        mode={modalMode}
+        initialData={initialStudentData || undefined}
       />
     </DashboardContent>
   );
