@@ -197,18 +197,126 @@ export async function createEstudiante(estudianteData: {
   municipio_nacimiento_id: number;
   promedio: number;
 }, token: string) {
-  const response = await fetch(`${BACKEND_URL}/estudiantes/`, {
-    method: 'POST',
+  console.log('Datos del estudiante a enviar:', estudianteData);
+  
+  // Crear el payload exactamente como lo espera el backend
+  const payload = {
+    codigo: estudianteData.codigo,
+    nombre: estudianteData.nombre,
+    tipo_documento_id: estudianteData.tipo_documento_id,
+    documento: estudianteData.documento,
+    semestre: estudianteData.semestre,
+    pensum: estudianteData.pensum,
+    ingreso: estudianteData.ingreso,
+    estado_matricula_id: estudianteData.estado_matricula_id,
+    celular: estudianteData.celular || null,
+    email_personal: estudianteData.email_personal || null,
+    email_institucional: estudianteData.email_institucional,
+    colegio_egresado_id: estudianteData.colegio_egresado_id,
+    municipio_nacimiento_id: estudianteData.municipio_nacimiento_id,
+    promedio: estudianteData.promedio
+  };
+  
+  console.log('Payload a enviar:', payload);
+  
+  try {
+    const response = await fetch(`${BACKEND_URL}/estudiantes/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    console.log('Respuesta del servidor:', response.status, response.statusText);
+
+    if (!response.ok) {
+      let errorMessage = 'Error al crear estudiante';
+      try {
+        const error = await response.json();
+        console.log('Error del servidor:', error);
+        errorMessage = error.detail || error.message || errorMessage;
+      } catch (e) {
+        console.log('Error al parsear respuesta:', e);
+        errorMessage = `Error ${response.status}: ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.log('Error en la petición:', error);
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error('Error de conexión con el servidor. Verifica que el backend esté ejecutándose.');
+    }
+    throw error;
+  }
+}
+
+// Tipos para las estadísticas
+export type TipoEstadistica = 'promedio' | 'colegio' | 'municipio' | 'nivel_riesgo' | 'semestre';
+export type TipoDiagrama = 'barras' | 'torta' | 'lineas';
+
+export interface EstadisticaItem {
+  etiqueta: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface EstadisticaPromedio {
+  promedio_general: number;
+  distribucion_niveles: EstadisticaItem[];
+  rango_promedios: Record<string, number>;
+}
+
+export interface EstadisticaGeneral {
+  total_estudiantes: number;
+  items: EstadisticaItem[];
+}
+
+export interface EstadisticasResponse {
+  tipo: TipoEstadistica;
+  datos: EstadisticaPromedio | EstadisticaGeneral;
+}
+
+// Función para obtener estadísticas
+export async function fetchEstadisticas(
+  tipo: TipoEstadistica,
+  token: string
+): Promise<EstadisticasResponse> {
+  const response = await fetch(`${BACKEND_URL}/estudiantes/estadisticas/?tipo=${tipo}`, {
     headers: {
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(estudianteData)
+    }
   });
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.detail || 'Error al crear estudiante');
+    throw new Error(error.detail || 'Error al obtener estadísticas');
+  }
+
+  return response.json();
+}
+
+// Función para generar diagrama
+export async function fetchDiagrama(
+  tipoEstadistica: TipoEstadistica,
+  tipoDiagrama: TipoDiagrama,
+  token: string
+) {
+  const response = await fetch(
+    `${BACKEND_URL}/estudiantes/diagramas/?tipo_estadistica=${tipoEstadistica}&tipo_diagrama=${tipoDiagrama}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Error al generar diagrama');
   }
 
   return response.json();

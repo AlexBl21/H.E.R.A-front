@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { OverviewAnalyticsView } from 'src/sections/overview/view';
+import { OverviewAnalyticsViewReal } from 'src/sections/overview/view/overview-analytics-view-real';
 
 // ----------------------------------------------------------------------
 
@@ -13,12 +13,12 @@ export default function Page() {
         <title> {`Dashboard - ${CONFIG.appName}`}</title>
         <meta
           name="description"
-          content="The starting point for your next project with Minimal UI Kit, built on the newest version of Material-UI ©, ready to be customized to your style"
+          content="Dashboard de análisis de estudiantes con datos reales del sistema H.A.R.E"
         />
-        <meta name="keywords" content="react,material,kit,application,dashboard,admin,template" />
+        <meta name="keywords" content="dashboard,estudiantes,analytics,rendimiento,riesgo" />
       </Helmet>
 
-      <OverviewAnalyticsView />
+      <OverviewAnalyticsViewReal />
     </>
   );
 }
