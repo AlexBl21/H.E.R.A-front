@@ -7,6 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import { AuthGuard } from 'src/components/auth-guard';
 
 // --------------------importamos con lazy las paginas-----------------------------
 
@@ -49,11 +50,13 @@ export function Router() {
     {
       path: 'dashboard',
       element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        <AuthGuard>
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        </AuthGuard>
       ),
       children: [
         { element: <DashboardPage />, index: true },

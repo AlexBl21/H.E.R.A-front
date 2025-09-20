@@ -17,6 +17,19 @@ export async function login(username: string, password: string) {
   return response.json();
 }
 
+export function logout() {
+  // Eliminar el token del localStorage
+  localStorage.removeItem('token');
+  
+  // Redirigir al usuario a la página de login
+  window.location.href = '/sign-in';
+}
+
+export function isAuthenticated(): boolean {
+  const token = localStorage.getItem('token');
+  return !!token;
+}
+
 export async function uploadExcel(file: File, token: string) {
   const formData = new FormData();
   formData.append('file', file);

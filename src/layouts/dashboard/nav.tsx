@@ -10,6 +10,7 @@ import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
+import { logout } from 'src/utils/authService';
 
 import { varAlpha } from 'src/theme/styles';
 
@@ -186,37 +187,42 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
             borderColor: 'divider'
           }}
         >
-          {bottomItems.map((item) => (
-            <ListItem disableGutters disablePadding key={item.title}>
-              <ListItemButton
-                disableGutters
-                component={RouterLink}
-                href={item.path}
-                sx={{
-                  pl: 2,
-                  py: 1,
-                  gap: 2,
-                  pr: 1.5,
-                  borderRadius: 0.75,
-                  typography: 'body2',
-                  fontWeight: 'fontWeightMedium',
-                  color: 'error.main',
-                  minHeight: 'var(--layout-nav-item-height)',
-                  '&:hover': {
-                    bgcolor: 'error.lighter',
-                  },
-                }}
-              >
-                <Box component="span" sx={{ width: 24, height: 24 }}>
-                  {item.icon}
-                </Box>
-                
-                <Box component="span" flexGrow={1}>
-                  {item.title}
-                </Box>
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {bottomItems.map((item) => {
+            const isLogout = item.title === 'Logout';
+            
+            return (
+              <ListItem disableGutters disablePadding key={item.title}>
+                <ListItemButton
+                  disableGutters
+                  component={isLogout ? 'button' : RouterLink}
+                  href={isLogout ? undefined : item.path}
+                  onClick={isLogout ? logout : undefined}
+                  sx={{
+                    pl: 2,
+                    py: 1,
+                    gap: 2,
+                    pr: 1.5,
+                    borderRadius: 0.75,
+                    typography: 'body2',
+                    fontWeight: 'fontWeightMedium',
+                    color: 'error.main',
+                    minHeight: 'var(--layout-nav-item-height)',
+                    '&:hover': {
+                      bgcolor: 'error.lighter',
+                    },
+                  }}
+                >
+                  <Box component="span" sx={{ width: 24, height: 24 }}>
+                    {item.icon}
+                  </Box>
+                  
+                  <Box component="span" flexGrow={1}>
+                    {item.title}
+                  </Box>
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </Box>
       )}
     </>
