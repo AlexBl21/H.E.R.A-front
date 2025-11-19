@@ -33,12 +33,20 @@ export function AnalyticsCurrentVisitsReal({ title, subheader, chart, loading = 
 
   const chartSeries = chart.series.map((item) => item.value);
 
-  const chartColors = chart.colors ?? [
-    theme.palette.error.main,    // Alto riesgo
-    theme.palette.warning.main,  // Medio riesgo
-    theme.palette.success.main,  // Bajo riesgo
-    theme.palette.info.main,     // Muy bajo riesgo
-  ];
+  const chartColors =
+    chart.colors ??
+    [
+      theme.palette.error.main, // Rojo
+      theme.palette.warning.main, // Naranja
+      theme.palette.success.main, // Verde
+      theme.palette.info.main, // Azul claro
+      theme.palette.primary.main, // Azul
+      theme.palette.secondary.main, // Morado
+      '#8E24AA', // Púrpura profundo
+      '#FDD835', // Amarillo intenso
+      '#26A69A', // Verde azulado
+      '#FF7043', // Coral
+    ];
 
   const chartOptions = useChart({
     chart: { sparkline: { enabled: true } },

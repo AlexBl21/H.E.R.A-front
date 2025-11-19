@@ -32,14 +32,20 @@ export function AnalyticsWebsiteVisitsReal({ title, subheader, chart, loading = 
 
   const chartOptions = useChart({
     colors: [
-      theme.palette.success.main,    // Verde
-      theme.palette.warning.main,    // Naranja
-      theme.palette.error.main,      // Rojo
-      theme.palette.info.main,       // Azul claro
-      '#9C27B0',                     // Púrpura
-      '#FF5722',                     // Rojo-naranja
-      '#795548',                     // Marrón
-      '#607D8B',                     // Azul gris
+      theme.palette.success.main, // Verde
+      theme.palette.warning.main, // Naranja
+      theme.palette.error.main, // Rojo
+      theme.palette.info.main, // Azul claro
+      theme.palette.primary.main, // Azul
+      theme.palette.secondary.main, // Morado
+      '#9C27B0', // Púrpura
+      '#FF5722', // Rojo-naranja
+      '#795548', // Marrón
+      '#607D8B', // Azul gris
+      '#26C6DA', // Turquesa
+      '#D4E157', // Lima
+      '#5C6BC0', // Índigo
+      '#FF8A65', // Coral suave
     ],
     xaxis: {
       categories: chart.categories,
