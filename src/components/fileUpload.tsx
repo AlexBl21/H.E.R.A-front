@@ -6,7 +6,6 @@ export function FileUpload() {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log("Archivo seleccionado:", file);
       // Aquí puedes manejar el archivo subido, por ejemplo, enviarlo al backend o mostrar un preview.
     }
   };

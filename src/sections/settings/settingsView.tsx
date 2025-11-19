@@ -12,7 +12,6 @@ export function SettingsView() {
 
   const handleSave = () => {
     // Lógica para guardar los cambios
-    console.log('Datos guardados:', { email, password, earlyAlerts, profileImage });
   };
 
   const handleProfileImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {

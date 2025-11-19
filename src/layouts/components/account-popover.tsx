@@ -97,42 +97,6 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
           </Typography>
         </Box>
 
-        <Divider sx={{ borderStyle: 'dashed' }} />
-
-        <MenuList
-          disablePadding
-          sx={{
-            p: 1,
-            gap: 0.5,
-            display: 'flex',
-            flexDirection: 'column',
-            [`& .${menuItemClasses.root}`]: {
-              px: 1,
-              gap: 2,
-              borderRadius: 0.75,
-              color: 'text.secondary',
-              '&:hover': { color: 'text.primary' },
-              [`&.${menuItemClasses.selected}`]: {
-                color: 'text.primary',
-                bgcolor: 'action.selected',
-                fontWeight: 'fontWeightSemiBold',
-              },
-            },
-          }}
-        >
-          {data.map((option) => (
-            <MenuItem
-              key={option.label}
-              selected={option.href === pathname}
-              onClick={() => handleClickItem(option.href)}
-            >
-              {option.icon}
-              {option.label}
-            </MenuItem>
-          ))}
-        </MenuList>
-
-        <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
           <Button fullWidth color="error" size="medium" variant="text" onClick={handleLogout}>

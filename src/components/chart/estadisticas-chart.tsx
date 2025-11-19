@@ -45,9 +45,8 @@ export function EstadisticasChart({ token, title = 'Estadísticas de Estudiantes
     setLoading(true);
     setError(null);
     try {
-      const diagrama = await fetchDiagrama(tipoEstadistica, tipoDiagrama, token);
+      await fetchDiagrama(tipoEstadistica, tipoDiagrama, token);
       // Aquí podrías mostrar la imagen base64 si prefieres esa opción
-      console.log('Diagrama generado:', diagrama);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -69,11 +68,8 @@ export function EstadisticasChart({ token, title = 'Estadísticas de Estudiantes
       categories = Object.keys(rangos);
       
       if (tipoDiagrama === 'torta') {
-        // Para gráfico de torta, formatear datos como array de objetos
-        series = Object.entries(rangos).map(([rango, cantidad]) => ({
-          name: rango,
-          value: cantidad
-        }));
+        // Para gráfico de torta, ApexCharts necesita un array de números
+        series = Object.values(rangos) as number[];
       } else {
         // Para barras y líneas, usar formato normal
         series = [{
@@ -95,11 +91,8 @@ export function EstadisticasChart({ token, title = 'Estadísticas de Estudiantes
       categories = items.map(item => item.etiqueta);
       
       if (tipoDiagrama === 'torta') {
-        // Para gráfico de torta, formatear datos como array de objetos
-        series = items.map(item => ({
-          name: item.etiqueta,
-          value: item.cantidad
-        }));
+        // Para gráfico de torta, ApexCharts necesita un array de números
+        series = items.map(item => item.cantidad);
       } else {
         // Para barras y líneas, usar formato normal
         series = [{
@@ -130,6 +123,7 @@ export function EstadisticasChart({ token, title = 'Estadísticas de Estudiantes
       zoom: { enabled: tipoDiagrama !== 'torta' }
     },
     colors: chartData.colors,
+    labels: tipoDiagrama === 'torta' ? chartData.categories : undefined,
     xaxis: {
       categories: tipoDiagrama === 'torta' ? undefined : chartData.categories
     },

@@ -150,7 +150,6 @@ export function UserView() {
   };
 
   const handleRegisterStudent = async (studentData: any) => {
-    console.log('handleRegisterStudent ejecutado con datos:', studentData);
     setCreating(true);
     setCreateError('');
     
@@ -164,9 +163,7 @@ export function UserView() {
         promedio: parseFloat(studentData.promedio as string)
       };
       
-      console.log('Creando estudiante...');
       await createEstudiante(processedData, token);
-      console.log('Estudiante creado exitosamente');
       
       // Actualizar la lista de estudiantes después de crear
       const filters: any = {};
@@ -174,13 +171,11 @@ export function UserView() {
       if (filterSemestre !== '') filters.semestre = filterSemestre.toString();
       if (filterRiesgo) filters.nivel_riesgo = filterRiesgo;
       
-      console.log('Actualizando lista de estudiantes...');
       const res = await fetchEstudiantes(token, filters);
       setEstudiantes(res.estudiantes);
       
       // Cerrar el modal
       setOpenModal(false);
-      console.log('Modal cerrado');
       
     } catch (err: any) {
       console.error('Error al crear estudiante:', err);

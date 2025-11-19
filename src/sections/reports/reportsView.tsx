@@ -1,11 +1,31 @@
 import React, { ChangeEvent, useState } from 'react';
-import { Box, Button, Card, CardContent, Grid, Typography, Select, MenuItem, InputLabel, FormControl, TextField, Tabs, Tab } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  TextField,
+  Tabs,
+  Tab,
+  Alert,
+  CircularProgress,
+  Stack,
+} from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { uploadExcel } from 'src/utils/authService';
-import { EstadisticasChart, DiagramaBackend } from 'src/components/chart';
+import { uploadExcel, descargarReportePDF } from 'src/utils/authService';
+import { EstadisticasChart } from 'src/components/chart';
+import { EstadisticasConFeedback } from 'src/components/reports';
+import { Iconify } from 'src/components/iconify';
 
 export function ReportsView() {
   const [selectedChartType, setSelectedChartType] = useState<string>('');
@@ -16,6 +36,9 @@ export function ReportsView() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [token, setToken] = useState<string | null>(null);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfSuccess, setPdfSuccess] = useState(false);
 
   // Obtener token al cargar el componente
   React.useEffect(() => {
@@ -58,19 +81,70 @@ export function ReportsView() {
     setActiveTab(newValue);
   };
 
+  const handleDescargarPDF = async () => {
+    if (!token) {
+      setPdfError('Debes estar autenticado para descargar el reporte');
+      return;
+    }
+
+    setDownloadingPDF(true);
+    setPdfError(null);
+    setPdfSuccess(false);
+
+    try {
+      await descargarReportePDF(token);
+      setPdfSuccess(true);
+      setTimeout(() => setPdfSuccess(false), 5000);
+    } catch (err: any) {
+      console.error('[ReportsView] Error al descargar PDF:', err);
+      const errorMessage = err.message || 'Error al generar el reporte PDF';
+      setPdfError(errorMessage);
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
   return (
     <DashboardContent>
-      <Box display="flex" alignItems="center" mb={5}>
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4" flexGrow={1}>
           Reportes de rendimiento
         </Typography>
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={
+            downloadingPDF ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <PictureAsPdfIcon />
+            )
+          }
+          onClick={handleDescargarPDF}
+          disabled={downloadingPDF || !token}
+          sx={{ ml: 2 }}
+        >
+          {downloadingPDF ? 'Generando PDF...' : 'Descargar Reporte PDF'}
+        </Button>
       </Box>
+
+      {/* Mensajes de éxito/error para PDF */}
+      {pdfSuccess && (
+        <Alert severity="success" sx={{ mb: 3 }} onClose={() => setPdfSuccess(false)}>
+          Reporte PDF descargado exitosamente
+        </Alert>
+      )}
+      {pdfError && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setPdfError(null)}>
+          {pdfError}
+        </Alert>
+      )}
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={activeTab} onChange={handleTabChange}>
           <Tab label="Cargar Datos" />
           <Tab label="Gráficas Interactivas" />
-          <Tab label="Diagramas Backend" />
+          <Tab label="Estadísticas con IA" />
         </Tabs>
       </Box>
 
@@ -190,15 +264,15 @@ export function ReportsView() {
       {activeTab === 2 && (
         <Box>
           {token ? (
-            <DiagramaBackend 
+            <EstadisticasConFeedback 
               token={token} 
-              title="Diagramas Generados por el Backend"
+              title="Estadísticas con Retroalimentación de IA"
               height={500}
             />
           ) : (
             <Card sx={{ p: 3, textAlign: 'center' }}>
               <Typography variant="h6" color="text.secondary">
-                Debes estar autenticado para ver los diagramas
+                Debes estar autenticado para ver las estadísticas con IA
               </Typography>
             </Card>
           )}

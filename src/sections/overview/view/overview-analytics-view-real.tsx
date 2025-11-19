@@ -58,13 +58,6 @@ export function OverviewAnalyticsViewReal() {
   const estudiantesMedioRiesgo = estudiantes.filter(est => calcularNivelRiesgo(est.promedio) === 'MEDIO').length;
   const estudiantesBajoRiesgo = estudiantes.filter(est => calcularNivelRiesgo(est.promedio) === 'BAJO').length;
 
-  // Debug: Log para revisar los datos
-  console.log('Lista de estudiantes:', estudiantes);
-  console.log('Total estudiantes calculado:', totalEstudiantes);
-  console.log('Estudiantes alto riesgo (calculado):', estudiantesAltoRiesgo);
-  console.log('Estudiantes medio riesgo (calculado):', estudiantesMedioRiesgo);
-  console.log('Estudiantes bajo riesgo (calculado):', estudiantesBajoRiesgo);
-  console.log('Datos de nivel de riesgo del backend:', estadisticas.nivelRiesgo?.datos && 'items' in estadisticas.nivelRiesgo.datos ? estadisticas.nivelRiesgo.datos.items : null);
 
   // Preparar datos para gráficos
   const distribucionPromedios = estadisticas.promedio && 'rango_promedios' in estadisticas.promedio.datos

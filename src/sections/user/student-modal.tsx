@@ -130,14 +130,10 @@ export default function StudentModal({ open, onClose, onSubmit, loading = false,
     setCatalogosError(null);
     try {
       const token = localStorage.getItem('token');
-      console.log('Token encontrado:', token ? 'Sí' : 'No');
       if (token) {
-        console.log('Intentando cargar catálogos...');
         const data = await fetchCatalogos(token);
-        console.log('Catálogos cargados:', data);
         setCatalogos(data);
       } else {
-        console.log('No hay token, usando datos mock');
         // Si no hay token, usar datos mock
         setCatalogos(mockCatalogos);
       }
@@ -159,38 +155,31 @@ export default function StudentModal({ open, onClose, onSubmit, loading = false,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleSubmit ejecutado');
-    console.log('Datos del formulario:', formData);
     
     // Validaciones
     if (!formData.codigo || !formData.nombre || !formData.documento || 
         !formData.semestre || !formData.pensum || !formData.ingreso ||
         !formData.email_institucional || !formData.promedio) {
-      console.log('Validación fallida: campos requeridos vacíos');
       return;
     }
 
     if (formData.tipo_documento_id === 0 || formData.estado_matricula_id === 0 ||
         formData.colegio_egresado_id === 0 || formData.municipio_nacimiento_id === 0) {
-      console.log('Validación fallida: selecciones de catálogo no válidas');
       return;
     }
 
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email_institucional)) {
-      console.log('Validación fallida: email institucional inválido');
       return;
     }
 
     // Validar promedio (0-5)
     const promedioNum = parseFloat(formData.promedio as string);
     if (Number.isNaN(promedioNum) || promedioNum < 0 || promedioNum > 5) {
-      console.log('Validación fallida: promedio fuera de rango');
       return;
     }
 
-    console.log('Todas las validaciones pasaron, llamando onSubmit');
     onSubmit(formData);
   };
 

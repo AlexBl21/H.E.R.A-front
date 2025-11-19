@@ -150,18 +150,13 @@ export async function updateEstudiante(
 
 // Función para cargar catálogos
 export async function fetchCatalogos(token: string) {
-  console.log('fetchCatalogos llamado con token:', token ? 'Presente' : 'Ausente');
-  
   const fetchOrThrow = async (url: string) => {
-    console.log(`Haciendo petición a: ${url}`);
     const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-    console.log(`Respuesta de ${url}:`, res.status, res.statusText);
     
     if (!res.ok) {
       let detail: string | undefined;
       try {
         const data: unknown = await res.json();
-        console.log(`Error response de ${url}:`, data);
         if (data && typeof data === 'object') {
           const maybeDetail = (data as Record<string, unknown>).detail;
           const maybeMessage = (data as Record<string, unknown>).message;
@@ -174,7 +169,6 @@ export async function fetchCatalogos(token: string) {
       throw new Error(detail ?? `Error al obtener ${url} (${res.status})`);
     }
     const result = await res.json();
-    console.log(`Datos obtenidos de ${url}:`, result);
     return result;
   };
 
@@ -210,8 +204,6 @@ export async function createEstudiante(estudianteData: {
   municipio_nacimiento_id: number;
   promedio: number;
 }, token: string) {
-  console.log('Datos del estudiante a enviar:', estudianteData);
-  
   // Crear el payload exactamente como lo espera el backend
   const payload = {
     codigo: estudianteData.codigo,
@@ -230,8 +222,6 @@ export async function createEstudiante(estudianteData: {
     promedio: estudianteData.promedio
   };
   
-  console.log('Payload a enviar:', payload);
-  
   try {
     const response = await fetch(`${BACKEND_URL}/estudiantes/`, {
       method: 'POST',
@@ -242,16 +232,12 @@ export async function createEstudiante(estudianteData: {
       body: JSON.stringify(payload)
     });
 
-    console.log('Respuesta del servidor:', response.status, response.statusText);
-
     if (!response.ok) {
       let errorMessage = 'Error al crear estudiante';
       try {
         const error = await response.json();
-        console.log('Error del servidor:', error);
         errorMessage = error.detail || error.message || errorMessage;
       } catch (e) {
-        console.log('Error al parsear respuesta:', e);
         errorMessage = `Error ${response.status}: ${response.statusText}`;
       }
       throw new Error(errorMessage);
@@ -259,7 +245,6 @@ export async function createEstudiante(estudianteData: {
 
     return await response.json();
   } catch (error) {
-    console.log('Error en la petición:', error);
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
       throw new Error('Error de conexión con el servidor. Verifica que el backend esté ejecutándose.');
     }
@@ -333,4 +318,129 @@ export async function fetchDiagrama(
   }
 
   return response.json();
+}
+
+// Interfaces para estadísticas con feedback
+export interface EstadisticasConFeedbackResponse {
+  estadisticas: EstadisticasResponse;
+  diagram_type: TipoDiagrama;
+  feedback: string;
+  used_ai: boolean;
+}
+
+export interface FeedbackRequest {
+  labels: string[];
+  values: number[];
+  tipo_est: TipoEstadistica;
+  tipo_diag: TipoDiagrama;
+}
+
+export interface FeedbackResponse {
+  feedback: string;
+  used_ai: boolean;
+}
+
+// Función para obtener estadísticas con retroalimentación de IA
+export async function fetchEstadisticasConFeedback(
+  tipo: TipoEstadistica,
+  token: string,
+  tipoDiagrama?: TipoDiagrama
+): Promise<EstadisticasConFeedbackResponse> {
+  let url = `${BACKEND_URL}/estudiantes/estadisticas/with-feedback?tipo=${tipo}`;
+  if (tipoDiagrama) {
+    url += `&tipo_diag=${tipoDiagrama}`;
+  }
+
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('[fetchEstadisticasConFeedback] Error al obtener estadísticas:', error);
+    throw new Error(error.detail || 'Error al obtener estadísticas con feedback');
+  }
+
+  return response.json();
+}
+
+// Función para generar retroalimentación personalizada
+export async function generarFeedback(
+  labels: string[],
+  values: number[],
+  tipoEst: TipoEstadistica,
+  tipoDiag: TipoDiagrama,
+  token: string
+): Promise<FeedbackResponse> {
+  const requestBody = {
+    labels,
+    values,
+    tipo_est: tipoEst,
+    tipo_diag: tipoDiag
+  };
+
+  const response = await fetch(
+    `${BACKEND_URL}/estudiantes/feedback`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('[generarFeedback] Error al generar feedback:', error);
+    throw new Error(error.detail || 'Error al generar feedback');
+  }
+
+  return response.json();
+}
+
+// Función para descargar reporte PDF completo
+export async function descargarReportePDF(token: string): Promise<void> {
+  const response = await fetch(
+    `${BACKEND_URL}/estudiantes/report/pdf`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    // Intentar obtener el error como JSON, si no, como texto
+    let errorMessage = 'Error al generar reporte PDF';
+    try {
+      const error = await response.json();
+      errorMessage = error.detail || error.message || errorMessage;
+      console.error('[descargarReportePDF] Error al generar PDF:', error);
+    } catch {
+      const errorText = await response.text();
+      errorMessage = errorText || errorMessage;
+      console.error('[descargarReportePDF] Error al generar PDF (texto):', errorText);
+    }
+    throw new Error(errorMessage);
+  }
+
+  const blob = await response.blob();
+  
+  if (blob.size === 0) {
+    throw new Error('El PDF generado está vacío. Verifica la configuración de la IA en el backend.');
+  }
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `report_estadisticas_${new Date().toISOString().split('T')[0]}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 } 
