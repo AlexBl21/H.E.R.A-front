@@ -33,9 +33,10 @@ type UserTableRowProps = {
   onDelete?: (codigoEstudiante: string) => void;
   onEdit?: (codigoEstudiante: string) => void;
   deleting?: boolean;
+  onRowClick?: (codigo: string) => void;
 };
 
-export function UserTableRow({ row, selected, onSelectRow, onDelete, onEdit, deleting = false }: UserTableRowProps) {
+export function UserTableRow({ row, selected, onSelectRow, onDelete, onEdit, deleting = false, onRowClick }: UserTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
@@ -71,9 +72,36 @@ export function UserTableRow({ row, selected, onSelectRow, onDelete, onEdit, del
     setOpenPopover(null);
   }, [onEdit, row.codigo]);
 
+  const handleRowClick = useCallback((event: React.MouseEvent<HTMLTableRowElement>) => {
+    // No activar el click si se hace click en el checkbox, botón de acciones o popover
+    const target = event.target as HTMLElement;
+    if (
+      target.closest('input[type="checkbox"]') ||
+      target.closest('button') ||
+      target.closest('[role="button"]')
+    ) {
+      return;
+    }
+    if (onRowClick) {
+      onRowClick(row.codigo);
+    }
+  }, [onRowClick, row.codigo]);
+
   return (
     <>
-      <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
+      <TableRow 
+        hover 
+        tabIndex={-1} 
+        role="checkbox" 
+        selected={selected}
+        onClick={handleRowClick}
+        sx={{
+          cursor: onRowClick ? 'pointer' : 'default',
+          '&:hover': {
+            bgcolor: onRowClick ? 'action.hover' : undefined,
+          },
+        }}
+      >
         <TableCell padding="checkbox">
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>

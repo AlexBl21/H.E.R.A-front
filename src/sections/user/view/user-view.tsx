@@ -17,6 +17,7 @@ import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import StudentModal from '../student-modal';
+import { StudentDetailCard } from '../student-detail-card';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 import type { UserProps } from '../user-table-row';
 
@@ -35,6 +36,7 @@ export function UserView() {
   const [deleting, setDeleting] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
+  const [selectedStudentCodigo, setSelectedStudentCodigo] = useState<string | null>(null);
 
   const handleOpenModal = () => {
     setModalMode('create');
@@ -241,6 +243,14 @@ export function UserView() {
 
   const notFound = !dataFiltered.length && !!filterName;
 
+  const handleRowClick = (codigo: string) => {
+    setSelectedStudentCodigo(codigo);
+  };
+
+  const handleCloseDetailCard = () => {
+    setSelectedStudentCodigo(null);
+  };
+
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
@@ -256,6 +266,11 @@ export function UserView() {
           Registrar Estudiante
         </Button>
       </Box>
+
+      {/* Card de detalle del estudiante */}
+      {selectedStudentCodigo && (
+        <StudentDetailCard codigo={selectedStudentCodigo} onClose={handleCloseDetailCard} />
+      )}
 
       <Card>
         <UserTableToolbar
@@ -329,6 +344,7 @@ export function UserView() {
                       onDelete={handleDeleteStudent}
                       onEdit={handleOpenEdit}
                       deleting={deleting}
+                      onRowClick={handleRowClick}
                     />
                   ))}
 
