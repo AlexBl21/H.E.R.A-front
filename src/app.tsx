@@ -39,7 +39,7 @@ export default function App() {
     <ThemeProvider>
       {/* ACA PODEMOS INCIAR A BUSCAR EL CONTENIDO */}
       <Router /> 
-      {githubButton}
+      
     </ThemeProvider>
   );
 }

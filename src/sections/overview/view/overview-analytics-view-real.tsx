@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { useEstadisticasDashboard } from 'src/hooks/use-estadisticas-dashboard';
 import { fetchEstudiantes } from 'src/utils/authService';
+import { Iconify } from 'src/components/iconify';
 import { AnalyticsWidgetSummaryReal } from '../analytics-widget-summary-real';
 import { AnalyticsCurrentVisitsReal } from '../analytics-current-visits-real';
 import { AnalyticsWebsiteVisitsReal } from '../analytics-website-visits-real';
@@ -120,7 +121,7 @@ export function OverviewAnalyticsViewReal() {
             title="Total Estudiantes"
             percent={0}
             total={totalEstudiantes}
-            icon={<img alt="icon" src="/assets/icons/glass/ic-glass-users.svg" />}
+            icon={<Iconify icon="solar:users-group-two-rounded-bold-duotone" width={48} height={48} />}
             chart={{
               categories: ['Ene', 'Feb', 'Mar', 'Abr'],
               series: [totalEstudiantes * 0.8, totalEstudiantes * 0.9, totalEstudiantes * 0.95, totalEstudiantes],
@@ -136,7 +137,7 @@ export function OverviewAnalyticsViewReal() {
             percent={0}
             total={promedioGeneral}
             color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic-glass-buy.svg" />}
+            icon={<Iconify icon="solar:chart-2-bold-duotone" width={48} height={48} />}
             chart={{
               categories: ['Ene', 'Feb', 'Mar', 'Abr'],
               series: [promedioGeneral * 0.9, promedioGeneral * 0.95, promedioGeneral * 0.98, promedioGeneral],
@@ -152,7 +153,7 @@ export function OverviewAnalyticsViewReal() {
             percent={0}
             total={estudiantesAltoRiesgo}
             color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic-glass-message.svg" />}
+            icon={<Iconify icon="solar:danger-triangle-bold-duotone" width={48} height={48} />}
             chart={{
               categories: ['Ene', 'Feb', 'Mar', 'Abr'],
               series: [estudiantesAltoRiesgo * 1.1, estudiantesAltoRiesgo * 1.05, estudiantesAltoRiesgo * 0.98, estudiantesAltoRiesgo],
@@ -168,7 +169,7 @@ export function OverviewAnalyticsViewReal() {
             percent={0}
             total={estudiantesBajoRiesgo}
             color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/ic-glass-bag.svg" />}
+            icon={<Iconify icon="solar:shield-check-bold-duotone" width={48} height={48} />}
             chart={{
               categories: ['Ene', 'Feb', 'Mar', 'Abr'],
               series: [estudiantesBajoRiesgo * 0.9, estudiantesBajoRiesgo * 0.95, estudiantesBajoRiesgo * 1.02, estudiantesBajoRiesgo],

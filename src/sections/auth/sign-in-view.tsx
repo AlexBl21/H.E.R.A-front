@@ -54,7 +54,7 @@ export function SignInView() {
       />
 
       <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
+        Olvidaste tu contraseña?
       </Link>
 
       <TextField
@@ -118,9 +118,9 @@ export function SignInView() {
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
         <Typography variant="h5">Sign in</Typography>
         <Typography variant="body2" color="text.secondary">
-          Don&apos;t have an account?
+          No tienes una cuenta?
           <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
+            Regístrate
           </Link>
         </Typography>
       </Box>
